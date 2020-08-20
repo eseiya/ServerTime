@@ -44,21 +44,24 @@ public class ServerTimeUtils {
     private static AtomicLong relativeServerTime = new AtomicLong(System.currentTimeMillis() - getCurLocalTime());
 
     /**
-     * 设置服务器时间,单位毫秒.
+     * 设置服务器时间.
+     * @param serverTime 服务器时间,单位毫秒
      */
     public static void setServerTime(long serverTime) {
         relativeServerTime.set(serverTime - getCurLocalTime());
     }
 
     /**
-     * 获取服务器时间,单位毫秒.如果未设置过服务器时间则为本地时间.
+     * 获取服务器时间.如果未设置过服务器时间则为本地时间.
+     * @return 返回服务器时间,单位毫秒
      */
     public static long getServerTime() {
         return relativeServerTime.get() + getCurLocalTime();
     }
 
     /**
-     * 返回服务器时间,单位秒.如果还未设置过服务器时间则为本地时间.
+     * 返回服务器时间.如果还未设置过服务器时间则为本地时间.
+     * @return 返回服务器时间,单位秒
      */
     public static int getServerTimeInSecond() {
         return (int) (getServerTime() / 1000);

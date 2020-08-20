@@ -6,9 +6,12 @@ buildscript {
         maven { url "http://maven.aliyun.com/nexus/content/groups/public/" }
         google()
         jcenter()
+        maven { url 'https://dl.bintray.com/hbzha/ServerTime' }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.3.2'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
     }
 }
 
