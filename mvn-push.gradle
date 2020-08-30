@@ -1,5 +1,11 @@
-apply plugin: 'maven'
+apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+version = PROJ_VERSION
+group = PROJ_GROUP
 
 //============artifacts===============
 if (project.hasProperty("android")) { // Android libraries
@@ -40,56 +46,51 @@ javadoc {
     }
 }
 
-//============maven===============
-uploadArchives {
-    repositories.mavenDeployer {
-        Properties properties = new Properties()
-        properties.load(project.rootProject.file('local.properties').newDataInputStream())
-        repository(url: properties.getProperty("LOCAL_REPOSITORY_URL")) {
-            authentication(userName: properties.getProperty("LOCAL_REPOSITORY_USER_NAME"), password: properties.getProperty("LOCAL_REPOSITORY_PASSWORD"))
+//============bintray===============
+def pomConfig = {
+    scm {
+        url PROJ_SITE_URL
+    }
+    developers {
+        developer {
+            id DEVELOPER_ID
+            name DEVELOPER_NAME
         }
+    }
+    licenses {
+        license {
+            name PROJ_LICENCE_NAME
+            url PROJ_LICENCE_URL
+            distribution PROJ_LICENCE_DEST
+        }
+    }
+}
 
-        pom.groupId = PROJ_GROUP
-        pom.artifactId = PROJ_ARTIFACTID
-        pom.version = PROJ_VERSION
-        pom.project {
-            packaging POM_PACKAGING
-            description PROJ_DESC
-            url PROJ_SITE_URL
-            scm {
-                connection PROJ_VCS_URL
-                developerConnection PROJ_VCS_URL
-                url PROJ_SITE_URL
+
+publishing {
+    publications {
+        Production(MavenPublication) {
+            afterEvaluate {
+                from components.release
             }
-            developers {
-                developer {
-                    id DEVELOPER_ID
-                    name DEVELOPER_NAME
-                }
-            }
-            licenses {
-                license {
-                    name PROJ_LICENCE_NAME
-                    url PROJ_LICENCE_URL
-                    distribution PROJ_LICENCE_DEST
-                }
+            groupId PROJ_GROUP
+            artifactId PROJ_ARTIFACTID
+            version PROJ_VERSION
+
+            pom.withXml {
+                def root = asNode()
+                root.children().last() + pomConfig
             }
         }
     }
 }
 
-//============bintray===============
-version = PROJ_VERSION
-group = PROJ_GROUP
-
-Properties properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
-
 bintray {
     user = properties.getProperty("bintray.user")
     key = properties.getProperty("bintray.apikey")
-
+    publications = ['Production']
     configurations = ['archives']
+    override = true
     pkg {
         repo = BINTRAY_REPO
         licenses = BINTRAY_LICENCE
@@ -97,7 +98,16 @@ bintray {
         desc = PROJ_DESC
         websiteUrl = PROJ_SITE_URL
         vcsUrl = PROJ_VCS_URL
+        websiteUrl = PROJ_SITE_URL
+        issueTrackerUrl = PROJ_ISSUE_URL
         publish = true
         publicDownloadNumbers = false
+//        dryRun = true
+        version {
+            name = this.version
+//            desc = "${this.version}"
+            released = new Date()
+//            vcsTag = this.version
+        }
     }
 }
