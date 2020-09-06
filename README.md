@@ -44,6 +44,6 @@ ServerTimeUtils.getServerTime();
 引入组件
 
 ```groovy
-implementation "com.eseiya:servertime:1.0.0"
+implementation "com.eseiya.servertime:servertime:1.0.0"
 ```
 

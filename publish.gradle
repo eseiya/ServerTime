@@ -48,6 +48,9 @@ javadoc {
 
 //============bintray===============
 def pomConfig = {
+    if (!project.hasProperty("android")) {
+        packaging POM_PACKAGING
+    }
     scm {
         url PROJ_SITE_URL
     }
@@ -59,9 +62,9 @@ def pomConfig = {
     }
     licenses {
         license {
-            name PROJ_LICENCE_NAME
-            url PROJ_LICENCE_URL
-            distribution PROJ_LICENCE_DEST
+            name 'The Apache Software License, Version 2.0'
+            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+            distribution 'repo'
         }
     }
 }
@@ -70,8 +73,12 @@ def pomConfig = {
 publishing {
     publications {
         Production(MavenPublication) {
-            afterEvaluate {
-                from components.release
+            if (project.hasProperty("android")) {
+                afterEvaluate {
+                    from components.release
+                }
+            } else {
+                from components.java
             }
             groupId PROJ_GROUP
             artifactId PROJ_ARTIFACTID
@@ -90,10 +97,9 @@ bintray {
     key = properties.getProperty("bintray.apikey")
     publications = ['Production']
     configurations = ['archives']
-    override = true
     pkg {
         repo = BINTRAY_REPO
-        licenses = BINTRAY_LICENCE
+        licenses = ['Apache-2.0']
         name = PROJ_ARTIFACTID
         desc = PROJ_DESC
         websiteUrl = PROJ_SITE_URL
@@ -102,12 +108,9 @@ bintray {
         issueTrackerUrl = PROJ_ISSUE_URL
         publish = true
         publicDownloadNumbers = false
-//        dryRun = true
         version {
             name = this.version
-//            desc = "${this.version}"
             released = new Date()
-//            vcsTag = this.version
         }
     }
 }
